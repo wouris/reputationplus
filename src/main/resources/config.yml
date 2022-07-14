@@ -1,0 +1,111 @@
+sql-connection:
+  host: 'localhost'
+  port: '3306'
+  user: 'root'
+  password: ''
+  database: 'reputationplus'
+options:
+  #                                     | PLACEHOLDERS |
+  # Player placeholders: %rep_player% - display name of the player that have executed the command
+  #                      %rep_player_reputation% - reputation of the player
+  #                      %rep_player_votes% - how many votes has the player given to another players
+  #
+  # Target placeholders: same ones, just replace player with target in each placeholder
+  #
+  # WARNING!
+  # These placeholders can be used exactly at the default messages here in this config
+  # Only use the placeholders that can be used in certain message (At every message you have instruction which ones you can use)
+  # Perfect scenario for this plugin would be just translating the messages or changing the colors
+
+
+  # limit of how many votes can one player give to another one no matter if he chose +rep or -rep
+  # example:
+  #   player1 rates player2 'maxVotes' times and cannot vote for him anymore, but he can vote for other players
+  maxVotes: 10
+  # sends player this message if the player has reached maximum votes set by maxVotes
+  maxVotes-message: '&cYou have reached the maximum amount of votes for this player!'
+
+  # set to false if you want to disable prefix in front of every message
+  use-prefix: true
+  prefix: '&8[&bReputation&3+&8]'
+
+  # set to true if you want to let players vote for themselves
+  can-self-vote: false
+  # this message will display if can-self-vote is false
+  no-self-vote-message: "&cYou can't vote for yourself!"
+
+  rep-command:
+    # use prefix in front of each message in rep-command-message
+    use-prefix: true
+    # messages that will be sent to the player by '/rep' command // please use player placeholders
+    messages:
+      - '&aYour reputation: &b%rep_player_reputation%'
+      - '&aYour votes: &b%rep_player_votes%'
+
+  # interval in which are players allowed to rate another player
+  interval-options:
+    # if you want to manage command interval by different plugin, you can disable this interval
+    enabled: true
+    # valid options s (seconds), m (minutes), h (hours), d (days)
+    # do not use something like 1d5h rather use 29h
+    interval: '1d'
+    # this message will display if player is not allowed to rate another player yet
+    message: '&cYou need to wait &6%rep_time%&c before you can rate again!'
+
+  gui-options:
+    # ONLY TARGET PLACEHOLDERS ARE VIABLE || DO NOT USE PLAYER PLACEHOLDERS
+    # the way this plugin is coded allows GUI to gather only target placeholders!!
+
+    # sets the title of GUI after /rep <player>
+    title: '&bReputation of &3%rep_target%'
+
+    target-head:
+      # color of the head in GUI
+      name-color: '&3'
+      # sets lore of the head
+      description:
+        - '&3Reputation: &a%rep_target_reputation%'
+        - '&3Votes: &a%rep_target_votes%'
+      # - null // you can use null if you don't want description
+
+    # set options for +rep button
+    +rep-button:
+      block: GREEN_TERRACOTTA
+      title: '&a+rep'
+      description:
+        - '&3Click to &aadd &31 reputation to &b%rep_target%'
+
+
+    # set options for -rep button
+    -rep-button:
+      block: RED_TERRACOTTA
+      title: '&c-rep'
+      description:
+        - '&3Click to &cremove &31 reputation from &b%rep_target%'
+    # set options for remaining slots of GUI, use null for empty slots
+    filler:
+      block: RED_STAINED_GLASS_PANE
+messages:
+  # sends player this message if he upvoted another player. Message has hover effect // please use only target placeholders
+  +rep-message: '&aYou have voted for &b%rep_target%&a!'
+  # sets hover message, type null to disable
+  +rep-hover-message: "&b%rep_target%&a's reputation is now &b%rep_target_reputation%"
+
+  # sends player this message if he downvoted another player. Message has hover effect // please use only target placeholders
+  -rep-message: '&aYou have downvoted &b%rep_target%&a!'
+  -rep-hover-message: "&b%rep_target%&a's reputation is now &b%rep_target_reputation%"
+
+  # after receiving positive vote from a player, the target will be notified with this message (if he is online). Message has hover effect
+  # please use player placeholders
+  +rep-message-target: '&aYou have recieved a positive vote from &b%rep_player%!'
+  # please use target placeholders
+  +rep-hover-message-target: '&aYour reputation is now &b%rep_target_reputation%'
+
+  # sends player this message if the player wanted to rate a player that haven't joined the server once
+  player-never-seen: '&cPlayer &6%rep_target% &chas never played on this server before!'
+
+  # sends player this message if the player does not have permission to use certain command
+  no-permission: "&cYou don't have permission to use this command!"
+
+  # sends player this message if the player reloads the config
+  config-reload: "&aConfig has been reloaded!"

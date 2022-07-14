@@ -1,0 +1,19 @@
+name: ReputationPlus
+version: '${project.version}'
+main: me.wouris.main
+authors: [ wouris ]
+api-version: 1.18
+description: Let your players reputate each other!
+depend: [PlaceholderAPI]
+commands:
+  rep:
+    usage: /rep <player>
+    aliases:
+      - reputation
+    description: Reputate a player
+  reptop:
+    usage: /reptop
+    description: Check the players with highest reputation
+  repreload:
+    usage: /repreload
+    description: Reloads Reputation+ config
