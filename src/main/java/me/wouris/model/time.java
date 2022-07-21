@@ -21,7 +21,7 @@ public class time {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastVote;
         try {
-            lastVote = plugin.getRepDatabase().getStats(p.getUniqueId()).getLastVote().toLocalDateTime();
+            lastVote = plugin.getRepDB().getStats(p.getUniqueId()).getLastVote().toLocalDateTime();
         } catch (NullPointerException e) {
             return;
         } catch (SQLException e) {

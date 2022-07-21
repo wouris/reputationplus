@@ -12,9 +12,12 @@ options:
   #
   # Target placeholders: same ones, just replace player with target in each placeholder
   #
+  # Other placeholders: %rep_time% - time until player is able to rate again
+  #
   # WARNING!
   # These placeholders can be used exactly at the default messages here in this config
-  # Only use the placeholders that can be used in certain message (At every message you have instruction which ones you can use)
+  # From update 3.1 you can use multiple placeholders in one message such as:
+  #                           %rep_target% was rated by &rep_player&! Now %rep_target% has %rep_target_reputation&!
   # Perfect scenario for this plugin would be just translating the messages or changing the colors
 
 
@@ -23,7 +26,7 @@ options:
   #   player1 rates player2 'maxVotes' times and cannot vote for him anymore, but he can vote for other players
   maxVotes: 10
   # sends player this message if the player has reached maximum votes set by maxVotes
-  maxVotes-message: '&cYou have reached the maximum amount of votes for this player!'
+  maxVotes-message: '&cYou have reached the maximum amount of votes &6%rep_target%&c!'
 
   # set to false if you want to disable prefix in front of every message
   use-prefix: true
@@ -37,7 +40,7 @@ options:
   rep-command:
     # use prefix in front of each message in rep-command-message
     use-prefix: true
-    # messages that will be sent to the player by '/rep' command // please use player placeholders
+    # messages that will be sent to the player by '/rep' command
     messages:
       - '&aYour reputation: &b%rep_player_reputation%'
       - '&aYour votes: &b%rep_player_votes%'
@@ -46,11 +49,11 @@ options:
   interval-options:
     # if you want to manage command interval by different plugin, you can disable this interval
     enabled: true
-    # valid options s (seconds), m (minutes), h (hours), d (days)
+    # valid options: s (seconds), m (minutes), h (hours), d (days)
     # do not use something like 1d5h rather use 29h
     interval: '1d'
     # this message will display if player is not allowed to rate another player yet
-    message: '&cYou need to wait &6%rep_time%&c before you can rate again!'
+    message: '&cYou need to wait &6%rep_time_until%&c before you can rate again!'
 
   gui-options:
     # ONLY TARGET PLACEHOLDERS ARE VIABLE || DO NOT USE PLAYER PLACEHOLDERS
@@ -59,8 +62,21 @@ options:
     # sets the title of GUI after /rep <player>
     title: '&bReputation of &3%rep_target%'
 
+    # this option changes the look of rep GUI. Shows 7 latest voters and their ratings on the target
+    show-latest-voters:
+      enabled: true
+      # this is a sign that shows under a target player head in GUI. You can set it's title here
+      sign-title: '&bLatest votes on &3%rep_target%'
+      # how you would want latest voters head to look
+      voter-head:
+        # rep_decision will handle color depending on whenever target has been voted +rep (green) or -rep (red)
+        title: '&6%rep_player% &7voted %rep_decision%'
+        description:
+          - '&6Reason: &e%rep_reason%'
+          - '&6Voted: &e%rep_time_ago%'
+
     target-head:
-      # color of the head in GUI
+      # color of the name of the target in GUI
       name-color: '&3'
       # sets lore of the head
       description:
@@ -75,7 +91,6 @@ options:
       description:
         - '&3Click to &aadd &31 reputation to &b%rep_target%'
 
-
     # set options for -rep button
     -rep-button:
       block: RED_TERRACOTTA
@@ -85,20 +100,81 @@ options:
     # set options for remaining slots of GUI, use null for empty slots
     filler:
       block: RED_STAINED_GLASS_PANE
+
+    reason-gui-options:
+      # title of +rep reason gui. Please to not make these titles equal
+      positive-title: '&aSelect a positive reason'
+      negative-title: '&cSelect a negative reason'
+
+      # reasons when a player selects +rep
+      +rep-reasons:
+        help:
+          name: '&aHelped me'
+          # you can look for every material name here https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+          material: DIAMOND
+          description:
+            - '&8%rep_target% really helped me out!'
+
+        gave:
+          name: '&aGived me items'
+          material: GOLD_INGOT
+          description:
+            - '&8%rep_target% gived me some items!'
+
+        kind:
+          name: '&aKind to me'
+          material: BOOK
+          description:
+            - '&8%rep_target% was very kind to me!'
+
+        # entry with 'custom-reason' will always be displayed at the end of the GUI. I wouldn't recommend removing it
+        custom-reason:
+          name: '&aCustom reason'
+          material: NAME_TAG
+          description:
+            - '&8Choose your own reason'
+
+        # you can add custom reasons here, please keep max reasons to 7
+        # anything:
+        #   name: '&aGive me a name!'
+        #   material: DIAMOND_HOE
+        #   description:
+        #     - '&8%rep_target% is super nice!'
+
+      -rep-reasons:
+        grief:
+          name: '&cGriefing'
+          material: DIAMOND_PICKAXE
+          description:
+            - '&8%rep_target% griefed!'
+        kill:
+          name: '&cKilling'
+          material: DIAMOND_SWORD
+          description:
+            - '&8%rep_target% is killing for no reason!'
+        scam:
+          name: '&cScammer'
+          material: ENDER_EYE
+          description:
+            - '&8%rep_target% scammed me!'
+        custom-reason:
+          name: '&cCustom reason'
+          material: NAME_TAG
+          description:
+            - '&8Choose your own reason'
+
 messages:
-  # sends player this message if he upvoted another player. Message has hover effect // please use only target placeholders
+  # sends player this message if he upvoted another player. Message has hover effect
   +rep-message: '&aYou have voted for &b%rep_target%&a!'
   # sets hover message, type null to disable
   +rep-hover-message: "&b%rep_target%&a's reputation is now &b%rep_target_reputation%"
 
-  # sends player this message if he downvoted another player. Message has hover effect // please use only target placeholders
+  # sends player this message if he downvoted another player. Message has hover effect
   -rep-message: '&aYou have downvoted &b%rep_target%&a!'
   -rep-hover-message: "&b%rep_target%&a's reputation is now &b%rep_target_reputation%"
 
   # after receiving positive vote from a player, the target will be notified with this message (if he is online). Message has hover effect
-  # please use player placeholders
   +rep-message-target: '&aYou have recieved a positive vote from &b%rep_player%!'
-  # please use target placeholders
   +rep-hover-message-target: '&aYour reputation is now &b%rep_target_reputation%'
 
   # sends player this message if the player wanted to rate a player that haven't joined the server once

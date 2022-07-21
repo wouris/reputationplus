@@ -18,17 +18,23 @@ public class voteDB {
     }
 
     public void initialize() throws SQLException {
-        Statement statement = this.plugin.getRepDatabase().getConnection().createStatement();
+        Statement statement = this.plugin.getRepDB().getConnection().createStatement();
         String sql = "CREATE TABLE IF NOT EXISTS votes(" +
                 "uuid VARCHAR(36), " +
                 "target VARCHAR(255), " +
                 "votes INT)";
         statement.execute(sql);
+        try{
+            sql = "ALTER TABLE votes ADD COLUMN reason VARCHAR(255)";
+            statement.execute(sql);
+        } catch (SQLException ignored){
+            // Column already exists
+        }
         statement.close();
     }
 
     public boolean hasReachedMaxVotes(UUID player, UUID target) throws SQLException {
-        PreparedStatement statement = this.plugin.getRepDatabase().getConnection()
+        PreparedStatement statement = this.plugin.getRepDB().getConnection()
                 .prepareStatement("SELECT votes FROM votes WHERE uuid = ? AND target = ?");
         statement.setString(1, player.toString());
         statement.setString(2, target.toString());
@@ -47,7 +53,7 @@ public class voteDB {
     }
 
     public voteStats getStats(UUID player, UUID target) throws SQLException{
-        PreparedStatement statement = this.plugin.getRepDatabase().getConnection()
+        PreparedStatement statement = this.plugin.getRepDB().getConnection()
                 .prepareStatement("SELECT * FROM votes WHERE uuid = ? AND target = ?");
         statement.setString(1, player.toString());
         statement.setString(2, target.toString());
@@ -66,7 +72,7 @@ public class voteDB {
     }
 
     public void createStats(voteStats stats) throws SQLException{
-        PreparedStatement statement = this.plugin.getRepDatabase().getConnection()
+        PreparedStatement statement = this.plugin.getRepDB().getConnection()
                 .prepareStatement("INSERT INTO votes (uuid, target, votes) VALUES (?,?,?)");
 
         statement.setString(1, stats.getPlayer().toString());
@@ -78,7 +84,7 @@ public class voteDB {
     }
 
     public void updateVotes(voteStats stats) throws SQLException{
-        PreparedStatement statement = this.plugin.getRepDatabase().getConnection()
+        PreparedStatement statement = this.plugin.getRepDB().getConnection()
                 .prepareStatement("UPDATE votes SET votes = ? WHERE uuid = ? AND target = ?");
 
         statement.setInt(1, stats.getVotes());

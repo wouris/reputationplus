@@ -2,6 +2,8 @@ package me.wouris.commands;
 
 import me.wouris.main;
 import me.wouris.utils.ChatUtils;
+import me.wouris.utils.Config;
+import me.wouris.utils.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,9 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public class reloadCommand implements CommandExecutor {
 
     private final main plugin;
+    private final Config config;
 
-    public reloadCommand(main plugin) {
+    public reloadCommand(main plugin, Config config) {
         this.plugin = plugin;
+        this.config = config;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class reloadCommand implements CommandExecutor {
         }else{
             this.plugin.reloadConfig();
             String message = this.plugin.getConfig().getString("messages.config-reload");
-            System.out.println(ChatUtils.format(prefix + message));
+            this.plugin.getLogger().info("Config reloaded!");
             return true;
         }
     }

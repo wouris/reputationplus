@@ -3,6 +3,7 @@ package me.wouris.commands;
 import me.wouris.main;
 import me.wouris.model.reputationStats;
 import me.wouris.utils.ChatUtils;
+import me.wouris.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,9 +18,11 @@ import java.util.List;
 public class reptopCommand implements CommandExecutor {
 
     private final main plugin;
+    private final Config config;
 
-    public reptopCommand(main plugin) {
+    public reptopCommand(main plugin, Config config) {
         this.plugin = plugin;
+        this.config = config;
     }
 
     @Override
@@ -27,11 +30,16 @@ public class reptopCommand implements CommandExecutor {
 
         if (sender instanceof Player p){
 
+            String prefix = "";
+            if (config.getUsePrefix()){
+                prefix = config.getPrefix() + " ";
+            }
+
             if (p.hasPermission("reputationplus.command")){
                 List<reputationStats> repList;
                 // list all players with highest reputation from sql
                 try {
-                    repList = plugin.getRepDatabase().getTopList();
+                    repList = plugin.getRepDB().getTopList();
                 } catch (SQLException ignored) {
                     p.sendMessage(ChatUtils.format("&8[&bReputation&3+&8] &cNo players found!"));
                     return true;
@@ -48,8 +56,9 @@ public class reptopCommand implements CommandExecutor {
                 }
 
             }else{
+                String message = config.getNoPermissionMessage();
                 p.sendMessage(
-                        ChatUtils.format("&8[&bReputation&3+&8] &cYou don't have permission to use this command!"));
+                        ChatUtils.format(prefix + message));
                 return true;
             }
         }

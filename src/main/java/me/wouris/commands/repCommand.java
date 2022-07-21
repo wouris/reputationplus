@@ -1,35 +1,33 @@
 package me.wouris.commands;
 
-import me.clip.placeholderapi.PlaceholderAPI;
+import me.wouris.GUIs.repGUIReasonDisabled;
+import me.wouris.GUIs.repGUIReasonEnabled;
 import me.wouris.main;
 import me.wouris.model.reputationStats;
 import me.wouris.model.time;
 import me.wouris.utils.ChatUtils;
+import me.wouris.utils.Config;
+import me.wouris.utils.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class repCommand implements CommandExecutor{
 
     private final main plugin;
+    private final Config config;
 
-    public repCommand(main plugin) {
+    public repCommand(main plugin, Config config) {
         this.plugin = plugin;
+        this.config = config;
     }
 
     @Override
@@ -38,8 +36,8 @@ public class repCommand implements CommandExecutor{
         if(sender instanceof Player p){
 
             String prefix = "";
-            if (this.plugin.getConfig().getBoolean("options.use-prefix")){
-                prefix = this.plugin.getConfig().getString("options.prefix") + " ";
+            if (config.getUsePrefix()){
+                prefix = config.getPrefix() + " ";
             }
 
             if (p.hasPermission("reputationplus.command")){
@@ -47,7 +45,7 @@ public class repCommand implements CommandExecutor{
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
                     this.plugin.setTarget(p.getUniqueId(), target.getUniqueId());
 
-                    boolean enabledInterval = this.plugin.getConfig().getBoolean("options.interval-options.enabled");
+                    boolean enabledInterval = config.getUseInterval();
 
                     if (enabledInterval){
                         boolean canVote = false;
@@ -64,18 +62,18 @@ public class repCommand implements CommandExecutor{
                         }
 
                         if (!canVote){
-                            p.sendMessage(ChatUtils.format(prefix + PlaceholderAPI.setPlaceholders(p,
-                                    this.plugin.getConfig().getString("options.interval-options.message"))));
+                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
+                                    plugin, config.getIntervalMessage(), target, p)));
                             return true;
                         }
                     }
 
 
-                    boolean canVoteForThemselves = this.plugin.getConfig().getBoolean("options.can-self-vote");
+                    boolean canVoteForThemselves = config.getCanSelfVote();
                     if (target.getName().equals(p.getName())){
                         if (!canVoteForThemselves) {
-                            p.sendMessage(ChatUtils.format(prefix +
-                                    this.plugin.getConfig().getString("options.no-self-vote-message")));
+                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
+                                    plugin, config.getNoSelfVoteMessage(), target, p)));
                             return true;
                         }
                     }
@@ -87,97 +85,52 @@ public class repCommand implements CommandExecutor{
 
                     if (!canVote){
                         p.sendMessage(ChatUtils.format(prefix +
-                                this.plugin.getConfig().getString("options.maxVotes-message")));
+                                Placeholder.setPlaceholders(plugin, config.getMaxVotesMessage(), target, p)));
                         return true;
                     }
 
                     if (target.hasPlayedBefore() || target.isOnline()){
-
-                        String guiTitle = PlaceholderAPI.setPlaceholders(target, this.plugin.getConfig().getString("options.gui-options.title"));
-                        Inventory inv = Bukkit.createInventory(p, 9*3,
-                                ChatUtils.format(guiTitle));
-
-                        Material material = Material.valueOf(this.plugin.getConfig().getString("options.gui-options.+rep-button.block"));
-                        ItemStack repplus = new ItemStack(material, 1);
-                        ItemMeta repplusMeta = repplus.getItemMeta();
-                        repplusMeta.setDisplayName(ChatUtils.format(this.plugin.getConfig().getString("options.gui-options.+rep-button.title")));
-                        List<String> repplusLore = this.plugin.getConfig().getStringList("options.gui-options.+rep-button.description");
-                        repplusLore.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(target, text)));
-                        repplusMeta.setLore(repplusLore);
-                        repplus.setItemMeta(repplusMeta);
-
-                        material = Material.valueOf(this.plugin.getConfig().getString("options.gui-options.-rep-button.block"));
-                        ItemStack repminus = new ItemStack(material, 1);
-                        ItemMeta repminusMeta = repminus.getItemMeta();
-                        repminusMeta.setDisplayName(ChatUtils.format(this.plugin.getConfig().getString("options.gui-options.-rep-button.title")));
-                        List<String> repminusLore = this.plugin.getConfig().getStringList("options.gui-options.-rep-button.description");
-                        repminusLore.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(target, text)));
-                        repminusMeta.setLore(repminusLore);
-                        repminus.setItemMeta(repminusMeta);
-
-                        material = Material.valueOf(this.plugin.getConfig().getString("options.gui-options.filler.block"));
-                        ItemStack filler = new ItemStack(material, 1);
-                        ItemMeta fillerMeta = filler.getItemMeta();
-                        fillerMeta.setDisplayName(" ");
-                        filler.setItemMeta(fillerMeta);
-
-                        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-                        ItemMeta playerHeadMeta = playerHead.getItemMeta();
-                        playerHeadMeta.setDisplayName(
-                                ChatUtils.format(this.plugin.getConfig().getString(
-                                                "options.gui-options.target-head.name-color")) + target.getName());
-                        List<String> playerHeadLore = this.plugin.getConfig().getStringList("options.gui-options.target-head.description");
-                        playerHeadLore.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(target, text)));
-                        playerHeadMeta.setLore(playerHeadLore);
-                        SkullMeta playerMeta = (SkullMeta) playerHead.getItemMeta();
-                        playerMeta.setOwningPlayer(target);
-                        playerHead.setItemMeta(playerHeadMeta);
-
-                        ItemStack[] array = new ItemStack[9*3];
-                        for (int i = 0; i < 9*3; i++){
-                            if(i == 12){
-                                array[i] = repplus;
-                            } else if (i == 14){
-                                array[i] = repminus;
-                            } else if (i == 4) {
-                                array[i] = playerHead;
-                            } else {
-                                array[i] = filler;
+                        boolean showReason = config.getShowRecentReasons();
+                        Inventory inv;
+                        if (showReason){
+                            try {
+                                inv = repGUIReasonEnabled.createGUI(p, target, this.plugin, config);
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
                             }
+                        } else{
+                            inv = repGUIReasonDisabled.createGUI(p, target, this.plugin, config);
                         }
-                        inv.setContents(array);
-
                         p.openInventory(inv);
                     }else{
-                        p.sendMessage(ChatUtils.format(prefix +
-                                PlaceholderAPI.setPlaceholders(target,
-                                        this.plugin.getConfig().getString("messages.player-never-seen"))));
+                        p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
+                                plugin, config.getPlayerNeverSeenMessage(), target, p)));
                     }
                 }else {
                     reputationStats stats;
                     int reputation = 0;
                     int votes = 0;
                     try {
-                        stats = plugin.getRepDatabase().getStats(p.getUniqueId());
+                        stats = plugin.getRepDB().getStats(p.getUniqueId());
                         try{
                             reputation = stats.getReputation();
                             votes = stats.getVotes();
                         } catch (NullPointerException ignored) {}
                     } catch (SQLException ignored) {}
 
-                    boolean usePrefix = this.plugin.getConfig().getBoolean("options.rep-command.use-prefix");
-                    List<String> messages = this.plugin.getConfig().getStringList("options.rep-command.messages");
+                    boolean usePrefix = config.getUsePrefixRepCommand();
+                    List<String> messages = config.getRepCommandMessages();
                     for (String message : messages){
                         if (usePrefix){
-                            p.sendMessage(ChatUtils.format(prefix + PlaceholderAPI.setPlaceholders(p, message)));
+                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(plugin, message, null, p)));
                         } else {
-                            p.sendMessage(ChatUtils.format(PlaceholderAPI.setPlaceholders(p, message)));
+                            p.sendMessage(ChatUtils.format(Placeholder.setPlaceholders(plugin, message, null, p)));
                         }
                     }
                     return true;
                 }
             }else{
-                String message = this.plugin.getConfig().getString("messages.no-permission");
+                String message = config.getNoPermissionMessage();
                 p.sendMessage(
                         ChatUtils.format(prefix + message));
                 return true;

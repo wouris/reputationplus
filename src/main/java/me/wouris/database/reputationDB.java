@@ -2,6 +2,7 @@ package me.wouris.database;
 
 import me.wouris.main;
 import me.wouris.model.reputationStats;
+import me.wouris.utils.Config;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.*;
@@ -13,9 +14,11 @@ public class reputationDB {
 
     private Connection connection;
     private final main plugin;
+    private final Config config;
 
-    public reputationDB(main plugin) {
+    public reputationDB(main plugin, Config config) {
         this.plugin = plugin;
+        this.config = config;
     }
 
     public Connection getConnection() throws SQLException {
@@ -23,12 +26,9 @@ public class reputationDB {
             return connection;
         }
 
-        String sqlURL = "jdbc:mysql://" +
-                this.plugin.getConfig().getString("sql-connection.host") + ":" +
-                this.plugin.getConfig().getString("sql-connection.port") + "/" +
-                this.plugin.getConfig().getString("sql-connection.database");
-        String user = this.plugin.getConfig().getString("sql-connection.user");
-        String password = this.plugin.getConfig().getString("sql-connection.password");
+        String sqlURL = "jdbc:mysql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase();
+        String user = config.getUser();
+        String password = config.getPassword();
 
         this.connection = DriverManager.getConnection(sqlURL, user, password);
         return this.connection;
