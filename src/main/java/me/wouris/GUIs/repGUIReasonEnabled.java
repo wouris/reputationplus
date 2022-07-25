@@ -1,10 +1,10 @@
 package me.wouris.GUIs;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.main;
 import me.wouris.model.reasonStats;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
-import me.wouris.utils.Placeholder;
 import me.wouris.utils.setBlocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,16 +17,13 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class repGUIReasonEnabled {
 
     public static Inventory createGUI(Player p, OfflinePlayer target, main plugin, Config config) throws SQLException {
-        String guiTitle = Placeholder.setPlaceholders(plugin, config.getRepGUITitle(), target, p);
+        String guiTitle = PlaceholderAPI.setPlaceholders(p, config.getRepGUITitle());
         Inventory inv = Bukkit.createInventory(p, 9*4, ChatUtils.format(guiTitle));
 
         ItemStack repplus = setBlocks.setBlock( plugin,
@@ -85,15 +82,19 @@ public class repGUIReasonEnabled {
                         if (config.getLatestVoterTitle().contains("%rep_player%")){
                             configTitle = configTitle.replaceAll("%rep_player%", rater.getName());
                         }
-                        configTitle = Placeholder.setPlaceholders(plugin, configTitle, target, p);
+                        if (config.getLatestVoterTitle().contains("%rep_target%")){
+                            configTitle = configTitle.replaceAll("%rep_target%", target.getName());
+                        }
                         configTitle = configTitle.replaceAll("%rep_decision%", decision);
                         configTitle = configTitle.replaceAll("%rep_reason%", reason);
+
+                        configTitle = PlaceholderAPI.setPlaceholders(rater, configTitle);
 
                         List<String> configDescription = config.getLatestVoterDesc();
                         for(int j = 0; j < configDescription.size(); j++){
 
-                            configDescription.set(j, ChatUtils.format(Placeholder.setPlaceholders(plugin,
-                                    configDescription.get(j).replaceAll("%rep_decision%", decision), target, p)));
+                            configDescription.set(j, ChatUtils.format(
+                                    configDescription.get(j).replaceAll("%rep_decision%", decision)));
 
                             configDescription.set(j,ChatUtils.format( configDescription.get(j).replaceAll("%rep_reason%", reason)));
 

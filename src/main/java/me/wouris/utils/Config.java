@@ -221,4 +221,16 @@ public class Config {
     public List<String> getLatestVoterDesc(){
         return plugin.getConfig().getStringList("options.gui-options.show-latest-voters.voter-head.description");
     }
+
+    public String getCustomReasonGUITitle(){
+        return plugin.getConfig().getString("options.gui-options.reason-gui-options.custom-reason.title");
+    }
+
+    public String getCustomReasonBlock(){
+        return plugin.getConfig().getString("options.gui-options.reason-gui-options.custom-reason.material");
+    }
+
+    public List<String> getCustomReasonDesc(){
+        return plugin.getConfig().getStringList("options.gui-options.reason-gui-options.custom-reason.description");
+    }
 }

@@ -1,9 +1,9 @@
 package me.wouris.GUIs;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.main;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
-import me.wouris.utils.Placeholder;
 import me.wouris.utils.setBlocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,13 +11,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 public class repGUIReasonDisabled {
 
     public static Inventory createGUI(Player p, OfflinePlayer target, main plugin, Config config){
 
-        String guiTitle = Placeholder.setPlaceholders(plugin, config.getRepGUITitle(), target, p);
+        String guiTitle = PlaceholderAPI.setPlaceholders(p, config.getRepGUITitle());
         Inventory inv = Bukkit.createInventory(p, 9*3, ChatUtils.format(guiTitle));
 
         ItemStack repplus = setBlocks.setBlock( plugin,

@@ -1,5 +1,6 @@
 package me.wouris.utils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.main;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -8,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.Collections;
 import java.util.List;
 
 public class setBlocks {
@@ -17,9 +17,9 @@ public class setBlocks {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemMeta.setDisplayName(ChatUtils.format(Placeholder.setPlaceholders(Plugin, name, target, null)));
+        itemMeta.setDisplayName(ChatUtils.format(PlaceholderAPI.setPlaceholders(target, name)));
         if (blockDescription != null){
-            blockDescription.replaceAll(text -> ChatUtils.format(Placeholder.setPlaceholders(Plugin, text, target, null)));
+            blockDescription.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(target, text)));
             itemMeta.setLore(blockDescription);
         }
         item.setItemMeta(itemMeta);
@@ -33,9 +33,7 @@ public class setBlocks {
         SkullMeta skullMeta = (SkullMeta) itemMeta;
         skullMeta.setDisplayName(ChatUtils.format(name));
         if (blockDescription != null){
-            for (int i = 0; i < blockDescription.size(); i++){
-                blockDescription.set(i, ChatUtils.format(Placeholder.setPlaceholders(Plugin, blockDescription.get(i), target, p)));
-            }
+            blockDescription.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(p, text)));
             itemMeta.setLore(blockDescription);
         }
         skullMeta.setOwningPlayer(target);
@@ -49,9 +47,7 @@ public class setBlocks {
         SkullMeta skullMeta = (SkullMeta) itemMeta;
         skullMeta.setDisplayName(ChatUtils.format(name));
         if (blockDescription != null){
-            for (int i = 0; i < blockDescription.size(); i++){
-                blockDescription.set(i, ChatUtils.format(Placeholder.setPlaceholders(Plugin, blockDescription.get(i), target, p)));
-            }
+            blockDescription.replaceAll(text -> ChatUtils.format(PlaceholderAPI.setPlaceholders(p, text)));
             itemMeta.setLore(blockDescription);
         }
         skullMeta.setOwningPlayer(p);

@@ -1,5 +1,6 @@
 package me.wouris.commands;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.GUIs.repGUIReasonDisabled;
 import me.wouris.GUIs.repGUIReasonEnabled;
 import me.wouris.main;
@@ -7,7 +8,6 @@ import me.wouris.model.reputationStats;
 import me.wouris.model.time;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
-import me.wouris.utils.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -62,8 +62,8 @@ public class repCommand implements CommandExecutor{
                         }
 
                         if (!canVote){
-                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
-                                    plugin, config.getIntervalMessage(), target, p)));
+                            p.sendMessage(ChatUtils.format(prefix + PlaceholderAPI.setPlaceholders(
+                                    p, config.getIntervalMessage())));
                             return true;
                         }
                     }
@@ -72,8 +72,8 @@ public class repCommand implements CommandExecutor{
                     boolean canVoteForThemselves = config.getCanSelfVote();
                     if (target.getName().equals(p.getName())){
                         if (!canVoteForThemselves) {
-                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
-                                    plugin, config.getNoSelfVoteMessage(), target, p)));
+                            p.sendMessage(ChatUtils.format(prefix + PlaceholderAPI.setPlaceholders(
+                                    p, config.getNoSelfVoteMessage())));
                             return true;
                         }
                     }
@@ -85,7 +85,7 @@ public class repCommand implements CommandExecutor{
 
                     if (!canVote){
                         p.sendMessage(ChatUtils.format(prefix +
-                                Placeholder.setPlaceholders(plugin, config.getMaxVotesMessage(), target, p)));
+                                PlaceholderAPI.setPlaceholders(p, config.getMaxVotesMessage())));
                         return true;
                     }
 
@@ -103,28 +103,18 @@ public class repCommand implements CommandExecutor{
                         }
                         p.openInventory(inv);
                     }else{
-                        p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(
-                                plugin, config.getPlayerNeverSeenMessage(), target, p)));
+                        p.sendMessage(ChatUtils.format(prefix +
+                                PlaceholderAPI.setPlaceholders(p, config.getPlayerNeverSeenMessage())));
                     }
                 }else {
-                    reputationStats stats;
-                    int reputation = 0;
-                    int votes = 0;
-                    try {
-                        stats = plugin.getRepDB().getStats(p.getUniqueId());
-                        try{
-                            reputation = stats.getReputation();
-                            votes = stats.getVotes();
-                        } catch (NullPointerException ignored) {}
-                    } catch (SQLException ignored) {}
 
                     boolean usePrefix = config.getUsePrefixRepCommand();
                     List<String> messages = config.getRepCommandMessages();
                     for (String message : messages){
                         if (usePrefix){
-                            p.sendMessage(ChatUtils.format(prefix + Placeholder.setPlaceholders(plugin, message, null, p)));
+                            p.sendMessage(ChatUtils.format(prefix + PlaceholderAPI.setPlaceholders(p, message)));
                         } else {
-                            p.sendMessage(ChatUtils.format(Placeholder.setPlaceholders(plugin, message, null, p)));
+                            p.sendMessage(ChatUtils.format(PlaceholderAPI.setPlaceholders(p, message)));
                         }
                     }
                     return true;
@@ -132,7 +122,7 @@ public class repCommand implements CommandExecutor{
             }else{
                 String message = config.getNoPermissionMessage();
                 p.sendMessage(
-                        ChatUtils.format(prefix + message));
+                        ChatUtils.format(PlaceholderAPI.setPlaceholders(p, prefix + message)));
                 return true;
             }
         }

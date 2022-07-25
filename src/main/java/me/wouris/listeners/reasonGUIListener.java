@@ -1,15 +1,14 @@
 package me.wouris.listeners;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import me.wouris.GUIs.customReasonGUI;
 import me.wouris.main;
 import me.wouris.model.reasonStats;
 import me.wouris.model.reputationStats;
 import me.wouris.model.voteStats;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
-import me.wouris.utils.Placeholder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import me.wouris.utils.messageSenderAfterRate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -20,8 +19,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 public class reasonGUIListener implements Listener {
@@ -42,16 +39,16 @@ public class reasonGUIListener implements Listener {
         try{
             target = this.plugin.getTarget(p.getUniqueId());
         }catch (IllegalArgumentException ex){
-            // this will accur if someone has not opened GUI yet and plugin will try to read target when there is none
+            // this will occur if someone has not opened GUI yet and plugin will try to read target when there is none
             // thus throwing this exception
             return;
         }
 
 
         if(!e.getView().getTitle().equalsIgnoreCase(ChatUtils.format(
-                Placeholder.setPlaceholders(plugin, config.getPositiveReasonGUITitle(), target, p)))
+                PlaceholderAPI.setPlaceholders(p, config.getPositiveReasonGUITitle())))
         && (!e.getView().getTitle().equalsIgnoreCase(ChatUtils.format(
-                Placeholder.setPlaceholders(plugin, config.getNegativeReasonGUITitle(), target, p))))) { return; }
+                PlaceholderAPI.setPlaceholders(p, config.getNegativeReasonGUITitle()))))) { return; }
 
         e.setCancelled(true);
 
@@ -68,9 +65,13 @@ public class reasonGUIListener implements Listener {
         voteStats voteStats = plugin.getVoteDB().getStats(p.getUniqueId(), target.getUniqueId());
 
         if (e.getView().getTitle().equalsIgnoreCase(ChatUtils.format(
-                Placeholder.setPlaceholders(plugin, config.getPositiveReasonGUITitle(), target, p)))) {
+                PlaceholderAPI.setPlaceholders(p, config.getPositiveReasonGUITitle())))) {
             if (e.getCurrentItem() != null){
                 Material item = e.getCurrentItem().getType();
+                if (e.getCurrentItem().getType().equals(Material.NAME_TAG)){
+                    customReasonGUI.manageGUI(p, plugin, config, "positive");
+                    return;
+                }
                 for (String reason : plusReasons) {
                     if (item == Material.valueOf(config.getReasonBlock("plus", reason))) {
 
@@ -97,30 +98,8 @@ public class reasonGUIListener implements Listener {
 
                         // create player stats or update if exists
                         setPlayerStats(p, target, playerStats, voteStats, "positive");
-
-                        int rep = targetStats.getReputation();
-                        // I could not find any viable solution other than this
                         // rater message
-                        TextComponent text = new TextComponent(ChatUtils.format(
-                                prefix + Placeholder.setPlaceholders(plugin, config.getPlusRepMessage(), target, p)));
-                        if (config.getPlusRepHoverMessage() != null)
-                            text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                    new Text(ChatUtils.format(
-                                           Placeholder.setPlaceholders(plugin, config.getPlusRepHoverMessage(), target, p)))));
-                        p.sendMessage(text);
-
-                        // target message
-                        if (target.isOnline()){
-                            text = new TextComponent(ChatUtils.format(
-                                    prefix + Placeholder.setPlaceholders(plugin,
-                                            config.getTargetPlusRepMessage(), target, p)));
-                            if (config.getTargetPlusRepHoverMessage() != null)
-                                text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                        new Text(ChatUtils.format(
-                                                Placeholder.setPlaceholders(plugin, config.getTargetPlusRepHoverMessage(), target, p)))));
-                            Player targetPlayer = (Player) target;
-                            targetPlayer.sendMessage(text);
-                        }
+                        messageSenderAfterRate.sendPlusRepMessage(p, prefix, config, target);
 
                         // remove unnecessary data to save memory space
                         this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
@@ -133,6 +112,11 @@ public class reasonGUIListener implements Listener {
         }else{
             if (e.getCurrentItem() != null){
                 Material item = e.getCurrentItem().getType();
+                if (e.getCurrentItem().getType().equals(Material.NAME_TAG)){
+                    customReasonGUI.manageGUI(p, plugin, config, "negative");
+                    return;
+                }
+
                 for (String reason : minusReasons) {
                     if (item == Material.valueOf(config.getReasonBlock("minus", reason))) {
 
@@ -160,14 +144,11 @@ public class reasonGUIListener implements Listener {
                         setPlayerStats(p, target, playerStats, voteStats, "negative");
 
                         // rater message
-                        int rep = targetStats.getReputation();
-                        TextComponent text = new TextComponent(ChatUtils.format(
-                                prefix + Placeholder.setPlaceholders(plugin, config.getMinusRepMessage(), target, p)));
-                        if (config.getMinusRepHoverMessage() != null)
-                            text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                    new Text(ChatUtils.format(
-                                            Placeholder.setPlaceholders(plugin, config.getMinusRepHoverMessage(), target, p)))));
-                        p.sendMessage(text);
+                        messageSenderAfterRate.sendMinusRepMessage(p, prefix, config);
+
+                        // remove unnecessary data to save memory space
+                        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
+
                         return;
                     }
                 }
@@ -179,21 +160,6 @@ public class reasonGUIListener implements Listener {
 
     private void setPlayerStats(Player p, OfflinePlayer target, reputationStats playerStats, voteStats voteStats, String decision) throws SQLException {
 
-        if (playerStats == null){
-            playerStats = new reputationStats(p.getUniqueId(), 0, 1, Timestamp.valueOf(LocalDateTime.now()));
-            this.plugin.getRepDB().createStats(playerStats);
-        }else{
-            playerStats.setVotes(playerStats.getVotes() + 1);
-            playerStats.setLastVote(Timestamp.valueOf(LocalDateTime.now()));
-            this.plugin.getRepDB().updateVotes(playerStats);
-        }
-
-        if (voteStats == null){
-            voteStats = new voteStats(p.getUniqueId(), target.getUniqueId(), 1);
-            this.plugin.getVoteDB().createStats(voteStats);
-        } else {
-            voteStats.setVotes(voteStats.getVotes() + 1);
-            this.plugin.getVoteDB().updateVotes(voteStats);
-        }
+        customReasonGUI.setPlayerStats(p, target, playerStats, voteStats, this.plugin);
     }
 }

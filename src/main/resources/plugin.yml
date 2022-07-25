@@ -4,7 +4,7 @@ main: me.wouris.main
 authors: [ wouris ]
 api-version: 1.18
 description: Let your players reputate each other!
-depend: [PlaceholderAPI]
+softdepend: [ PlaceholderAPI ]
 commands:
   rep:
     usage: /rep <player>

@@ -1,5 +1,6 @@
 package me.wouris.listeners;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.GUIs.minusRepReasonGUI;
 import me.wouris.GUIs.plusRepReasonGUI;
 import me.wouris.main;
@@ -7,7 +8,6 @@ import me.wouris.model.reputationStats;
 import me.wouris.model.voteStats;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
-import me.wouris.utils.Placeholder;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -31,10 +31,17 @@ public class repGUIListener implements Listener {
     public void repGUIClick(InventoryClickEvent e) throws SQLException {
         Player p = (Player) e.getWhoClicked();
 
-        OfflinePlayer target = this.plugin.getTarget(p.getUniqueId());
+        OfflinePlayer target;
+        try{
+            target = this.plugin.getTarget(p.getUniqueId());
+        }catch (IllegalArgumentException ex){
+            // this will occur if someone has not opened GUI yet and plugin will try to read target when there is none
+            // thus throwing this exception
+            return;
+        }
 
         if(!e.getView().getTitle().equalsIgnoreCase(ChatUtils.format(
-                    Placeholder.setPlaceholders(plugin, config.getRepGUITitle(), target, p)))) { return; }
+                    PlaceholderAPI.setPlaceholders(p, config.getRepGUITitle())))) { return; }
 
         e.setCancelled(true);
 
