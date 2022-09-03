@@ -61,7 +61,7 @@ public final class main extends JavaPlugin {
         // sql database
         boolean isDisabled = setSQL();
 
-        new placeholderAPI(this).register();
+        setPlaceholders();
 
         // register Listeners
         getServer().getPluginManager().registerEvents(new repGUIListener(this, config), this);
@@ -113,6 +113,7 @@ public final class main extends JavaPlugin {
     private void setPlaceholders(){
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new placeholderAPI(this).register();
+            new placeholderAPI_reptop(this).register();
         }
     }
 }

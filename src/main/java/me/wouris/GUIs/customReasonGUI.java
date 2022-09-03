@@ -8,11 +8,6 @@ import me.wouris.model.voteStats;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
 import me.wouris.utils.messageSenderAfterRate;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -20,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.Prefix;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -28,7 +22,7 @@ import java.time.LocalDateTime;
 
 public class customReasonGUI {
 
-    public static void manageGUI(Player p, main plugin, Config config, final String decision) throws SQLException {
+    public static void manageGUI(Player p, main plugin, Config config, final String decision) {
 
         // create items
         ItemStack nameTag = new ItemStack(Material.NAME_TAG);

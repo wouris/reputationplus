@@ -48,6 +48,17 @@ options:
       - '&aYour reputation: &b%rep_player_reputation%'
       - '&aYour votes: &b%rep_player_votes%'
 
+  reptop-command:
+    # maximum number of players shown
+    limit: 5
+    # message if there are no players in the database thus no one can be shown
+    no-players-found: '&cNo players found!'
+    # you can use {position}, {name} and {reputation} placeholders in this message
+    format:
+      - "&bTop Rated Players:"
+      # please use message below always as the last one
+      - "&3{position}: &b{name} &3- &b{reputation}"
+
   # interval in which are players allowed to rate another player
   interval-options:
     # if you want to manage command interval by different plugin, you can disable this interval

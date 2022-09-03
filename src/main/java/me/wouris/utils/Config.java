@@ -233,4 +233,16 @@ public class Config {
     public List<String> getCustomReasonDesc(){
         return plugin.getConfig().getStringList("options.gui-options.reason-gui-options.custom-reason.description");
     }
+
+    public int getRepTopLimit(){
+        return plugin.getConfig().getInt("options.reptop-command.limit");
+    }
+
+    public String getRepTopNoPlayers(){
+        return plugin.getConfig().getString("options.reptop-command.no-players-found");
+    }
+
+    public List<String> getRepTopFormat(){
+        return plugin.getConfig().getStringList("options.reptop-command.format");
+    }
 }

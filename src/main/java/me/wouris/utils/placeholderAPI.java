@@ -4,6 +4,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
 import me.wouris.main;
 import me.wouris.model.reasonStats;
+import me.wouris.model.reputationStats;
 import me.wouris.model.time;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

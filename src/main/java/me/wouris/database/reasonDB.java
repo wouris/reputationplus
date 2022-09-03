@@ -80,17 +80,6 @@ public class reasonDB {
         statement.close();
     }
 
-    public void removeReason(reasonStats stats) throws SQLException{
-        PreparedStatement statement = plugin.getRepDB().getConnection()
-                .prepareStatement("DELETE FROM reasons WHERE target = ? AND rater = ?");
-
-        statement.setString(1, stats.getTarget());
-        statement.setString(2, stats.getRater());
-
-        statement.executeUpdate();
-        statement.close();
-    }
-
     public List<reasonStats> getLatestVoters(String target) throws SQLException{
         List<reasonStats> voterList = new ArrayList<>();
 

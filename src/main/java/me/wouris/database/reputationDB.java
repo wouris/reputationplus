@@ -103,10 +103,11 @@ public class reputationDB {
 
     public List<reputationStats> getTopList() throws SQLException{
         List<reputationStats> repList = new ArrayList<>();
+        int limit = config.getRepTopLimit();
 
-        Statement statement = getConnection().createStatement();
-        String sql = "SELECT * FROM reputation ORDER BY reputation DESC LIMIT 5";
-        ResultSet result = statement.executeQuery(sql);
+        PreparedStatement statement = getConnection().prepareStatement("SELECT * FROM reputation ORDER BY reputation DESC LIMIT ?");
+        statement.setInt(1, limit);
+        ResultSet result = statement.executeQuery();
 
         while (result.next()){
             UUID uuid = UUID.fromString(result.getString("uuid"));
@@ -117,5 +118,20 @@ public class reputationDB {
 
         statement.close();
         return repList;
+    }
+
+    public reputationStats getTop(int position) throws SQLException{
+        PreparedStatement statement = getConnection().prepareStatement("SELECT * FROM reputation ORDER BY reputation DESC LIMIT ?, 1");
+        statement.setInt(1, position - 1);
+        ResultSet result = statement.executeQuery();
+        if (result.next()){
+            UUID uuid = UUID.fromString(result.getString("uuid"));
+            int rep = result.getInt("reputation");
+            reputationStats repStats = new reputationStats(uuid, rep);
+            statement.close();
+            return repStats;
+        }
+        statement.close();
+        return null;
     }
 }

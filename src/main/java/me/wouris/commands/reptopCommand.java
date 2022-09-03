@@ -37,22 +37,26 @@ public class reptopCommand implements CommandExecutor {
 
             if (p.hasPermission("reputationplus.command")){
                 List<reputationStats> repList;
+                List<String> messageFormat = config.getRepTopFormat();
                 // list all players with highest reputation from sql
                 try {
                     repList = plugin.getRepDB().getTopList();
-                } catch (SQLException ignored) {
-                    p.sendMessage(ChatUtils.format("&8[&bReputation&3+&8] &cNo players found!"));
+                } catch (SQLException e) {
+                    p.sendMessage(ChatUtils.format(prefix + config.getRepTopNoPlayers()));
                     return true;
                 }
-                // send top list to player via message
-                p.sendMessage(ChatUtils.format("&bTop Rated Players:"));
+
+                messageFormat.subList(0, messageFormat.size() - 1).forEach(s -> {
+                    p.sendMessage(ChatUtils.format(s));
+                });
+
                 for (int i = 0; i < repList.size(); i++){
                     String name = Bukkit.getOfflinePlayer(repList.get(i).getUUID()).getName();
-                    if (repList.get(i).getReputation() > 0){
-                        p.sendMessage(ChatUtils.format((i+1) + ": &3" + name + " &a- &3" + repList.get(i).getReputation()));
-                    }else{
-                        p.sendMessage(ChatUtils.format((i+1) + ": &3" + name + " &a- &c" + repList.get(i).getReputation()));
-                    }
+                    String message = messageFormat.get(messageFormat.size()-1)
+                            .replace("{position}", String.valueOf(i + 1))
+                            .replace("{name}", name)
+                            .replace("{reputation}", String.valueOf(repList.get(i).getReputation()));
+                    p.sendMessage(ChatUtils.format(message));
                 }
 
             }else{
