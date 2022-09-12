@@ -81,7 +81,7 @@ public class Config {
         return plugin.getConfig().getString("options.gui-options.title");
     }
 
-    public boolean getShowRecentReasons() {
+    public boolean getShowRecentRaters() {
         return plugin.getConfig().getBoolean("options.gui-options.show-latest-voters.enabled");
     }
 
@@ -244,5 +244,13 @@ public class Config {
 
     public List<String> getRepTopFormat(){
         return plugin.getConfig().getStringList("options.reptop-command.format");
+    }
+
+    public boolean isPlusRepOnly(){
+        return plugin.getConfig().getBoolean("options.rep-command.plus-rep-only");
+    }
+
+    public boolean isReasonEnabled(){
+        return plugin.getConfig().getBoolean("options.gui-options.enable-reasons");
     }
 }

@@ -23,11 +23,11 @@ import java.util.List;
 
 public class reasonGUIListener implements Listener {
 
-    private final main plugin;
+    private static final main plugin = null;
     private final Config config;
 
     public reasonGUIListener(main plugin, Config config) {
-        this.plugin = plugin;
+        plugin = plugin;
         this.config = config;
     }
 
@@ -62,7 +62,7 @@ public class reasonGUIListener implements Listener {
 
         reputationStats playerStats = plugin.getRepDB().getStats(p.getUniqueId());
         reputationStats targetStats = plugin.getRepDB().getStats(target.getUniqueId());
-        voteStats voteStats = plugin.getVoteDB().getStats(p.getUniqueId(), target.getUniqueId());
+        voteStats vStats = plugin.getVoteDB().getStats(p.getUniqueId(), target.getUniqueId());
 
         if (e.getView().getTitle().equalsIgnoreCase(ChatUtils.format(
                 PlaceholderAPI.setPlaceholders(p, config.getPositiveReasonGUITitle())))) {
@@ -75,34 +75,36 @@ public class reasonGUIListener implements Listener {
                 for (String reason : plusReasons) {
                     if (item == Material.valueOf(config.getReasonBlock("plus", reason))) {
 
-                        p.closeInventory();
-
-                        // create a reason entry in the database
-                        reasonStats reasonStats = new reasonStats(
-                                target.getUniqueId().toString(),
-                                p.getUniqueId().toString(),
-                                "positive",
-                                config.getReasonName("plus", ChatColor.stripColor(reason)),
-                                new Timestamp(System.currentTimeMillis()));
-                        plugin.getReasonDB().createReason(reasonStats);
-
-                        // create target stats or update if exists
-                        if (targetStats == null){
-                            targetStats = new reputationStats(target.getUniqueId(), 1, 0, null);
-
-                            this.plugin.getRepDB().createStats(targetStats);
-                        } else {
-                            targetStats.setReputation(targetStats.getReputation() + 1);
-                            this.plugin.getRepDB().updateReputation(targetStats);
-                        }
-
-                        // create player stats or update if exists
-                        setPlayerStats(p, target, playerStats, voteStats, "positive");
-                        // rater message
-                        messageSenderAfterRate.sendPlusRepMessage(p, prefix, config, target);
-
-                        // remove unnecessary data to save memory space
-                        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
+//                        p.closeInventory();
+//
+//                        // create a reason entry in the database
+//                        reasonStats reasonStats = new reasonStats(
+//                                target.getUniqueId().toString(),
+//                                p.getUniqueId().toString(),
+//                                "positive",
+//                                config.getReasonName("plus", ChatColor.stripColor(reason)),
+//                                new Timestamp(System.currentTimeMillis()));
+//                        plugin.getReasonDB().createReason(reasonStats);
+//
+//                        // create target stats or update if exists
+//                        if (targetStats == null){
+//                            targetStats = new reputationStats(target.getUniqueId(), 1, 0, null);
+//
+//                            this.plugin.getRepDB().createStats(targetStats);
+//                        } else {
+//                            targetStats.setReputation(targetStats.getReputation() + 1);
+//                            this.plugin.getRepDB().updateReputation(targetStats);
+//                        }
+//
+//                        // create player stats or update if exists
+//                        setPlayerStats(p, target, playerStats, voteStats, "positive");
+//                        // rater message
+//                        messageSenderAfterRate.sendPlusRepMessage(p, prefix, config, target);
+//
+//                        // remove unnecessary data to save memory space
+//                        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
+                        preparePlayerStats(true, "positive", p, target, reason,
+                                targetStats, playerStats, vStats, prefix);
                         return;
                     }
                 }
@@ -120,35 +122,36 @@ public class reasonGUIListener implements Listener {
                 for (String reason : minusReasons) {
                     if (item == Material.valueOf(config.getReasonBlock("minus", reason))) {
 
-                        p.closeInventory();
-
-                        // create a reason entry in the database
-                        reasonStats reasonStats = new reasonStats(
-                                target.getUniqueId().toString(),
-                                p.getUniqueId().toString(),
-                                "negative",
-                                config.getReasonName("minus", ChatColor.stripColor(reason)),
-                                new Timestamp(System.currentTimeMillis()));
-                        plugin.getReasonDB().createReason(reasonStats);
-
-                        // create target stats or update if exists
-                        if (targetStats == null){
-                            targetStats = new reputationStats(target.getUniqueId(), -1, 0, null);
-                            this.plugin.getRepDB().createStats(targetStats);
-                        } else {
-                            targetStats.setReputation(targetStats.getReputation() - 1);
-                            this.plugin.getRepDB().updateReputation(targetStats);
-                        }
-
-                        // create player stats or update if exists
-                        setPlayerStats(p, target, playerStats, voteStats, "negative");
-
-                        // rater message
-                        messageSenderAfterRate.sendMinusRepMessage(p, prefix, config);
-
-                        // remove unnecessary data to save memory space
-                        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
-
+//                        p.closeInventory();
+//
+//                        // create a reason entry in the database
+//                        reasonStats reasonStats = new reasonStats(
+//                                target.getUniqueId().toString(),
+//                                p.getUniqueId().toString(),
+//                                "negative",
+//                                config.getReasonName("minus", ChatColor.stripColor(reason)),
+//                                new Timestamp(System.currentTimeMillis()));
+//                        plugin.getReasonDB().createReason(reasonStats);
+//
+//                        // create target stats or update if exists
+//                        if (targetStats == null){
+//                            targetStats = new reputationStats(target.getUniqueId(), -1, 0, null);
+//                            this.plugin.getRepDB().createStats(targetStats);
+//                        } else {
+//                            targetStats.setReputation(targetStats.getReputation() - 1);
+//                            this.plugin.getRepDB().updateReputation(targetStats);
+//                        }
+//
+//                        // create player stats or update if exists
+//                        setPlayerStats(p, target, playerStats, voteStats, "negative");
+//
+//                        // rater message
+//                        messageSenderAfterRate.sendMinusRepMessage(p, prefix, config);
+//
+//                        // remove unnecessary data to save memory space
+//                        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
+                        preparePlayerStats(true, "negative", p, target, reason,
+                                targetStats, playerStats, vStats, prefix);
                         return;
                     }
                 }
@@ -158,7 +161,58 @@ public class reasonGUIListener implements Listener {
         }
     }
 
-    private void setPlayerStats(Player p, OfflinePlayer target, reputationStats playerStats, voteStats voteStats, String decision) throws SQLException {
+    void preparePlayerStats(boolean useReason, String decision, Player p, OfflinePlayer target, String reason,
+                                          reputationStats targetStats, reputationStats playerStats, voteStats vStats, String prefix) throws SQLException {
+        p.closeInventory();
+
+        if (useReason){
+            // create a reason entry in the database
+            if (decision.equals("positive")){
+                reasonStats reasonStats = new reasonStats(
+                        target.getUniqueId().toString(),
+                        p.getUniqueId().toString(),
+                        "positive",
+                        config.getReasonName("plus", ChatColor.stripColor(reason)),
+                        new Timestamp(System.currentTimeMillis()));
+                plugin.getReasonDB().createReason(reasonStats);
+            } else {
+                reasonStats reasonStats = new reasonStats(
+                        target.getUniqueId().toString(),
+                        p.getUniqueId().toString(),
+                        "negative",
+                        config.getReasonName("minus", ChatColor.stripColor(reason)),
+                        new Timestamp(System.currentTimeMillis()));
+                plugin.getReasonDB().createReason(reasonStats);
+            }
+        }
+
+        // create target stats or update if exists
+        if (targetStats == null){
+            if (decision.equals("positive"))
+                targetStats = new reputationStats(target.getUniqueId(), 1, 0, null);
+            else
+                targetStats = new reputationStats(target.getUniqueId(), -1, 0, null);
+
+            this.plugin.getRepDB().createStats(targetStats);
+        } else {
+            if (decision.equals("negative"))
+                targetStats.setReputation(targetStats.getReputation() + 1);
+            else
+                targetStats.setReputation(targetStats.getReputation() - 1);
+
+            this.plugin.getRepDB().updateReputation(targetStats);
+        }
+
+        // create player stats or update if exists
+        setPlayerStats(p, target, playerStats, vStats, "positive");
+        // rater message
+        messageSenderAfterRate.sendPlusRepMessage(p, prefix, config, target);
+
+        // remove unnecessary data to save memory space
+        this.plugin.removeData(p.getUniqueId(), target.getUniqueId());
+    }
+
+    void setPlayerStats(Player p, OfflinePlayer target, reputationStats playerStats, voteStats voteStats, String decision) throws SQLException {
 
         customReasonGUI.setPlayerStats(p, target, playerStats, voteStats, this.plugin);
     }

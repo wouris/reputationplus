@@ -1,10 +1,9 @@
 package me.wouris.commands;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.wouris.GUIs.repGUIReasonDisabled;
-import me.wouris.GUIs.repGUIReasonEnabled;
+import me.wouris.GUIs.repGUIRatersDisabled;
+import me.wouris.GUIs.repGUIRatersEnabled;
 import me.wouris.main;
-import me.wouris.model.reputationStats;
 import me.wouris.model.time;
 import me.wouris.utils.ChatUtils;
 import me.wouris.utils.Config;
@@ -90,16 +89,16 @@ public class repCommand implements CommandExecutor{
                     }
 
                     if (target.hasPlayedBefore() || target.isOnline()){
-                        boolean showReason = config.getShowRecentReasons();
+                        boolean showRaters = config.getShowRecentRaters();
                         Inventory inv;
-                        if (showReason){
+                        if (showRaters){
                             try {
-                                inv = repGUIReasonEnabled.createGUI(p, target, this.plugin, config);
+                                inv = repGUIRatersEnabled.createGUI(p, target, this.plugin, config);
                             } catch (SQLException e) {
                                 throw new RuntimeException(e);
                             }
                         } else{
-                            inv = repGUIReasonDisabled.createGUI(p, target, this.plugin, config);
+                            inv = repGUIRatersDisabled.createGUI(p, target, this.plugin, config);
                         }
                         p.openInventory(inv);
                     }else{
@@ -107,7 +106,6 @@ public class repCommand implements CommandExecutor{
                                 PlaceholderAPI.setPlaceholders(p, config.getPlayerNeverSeenMessage())));
                     }
                 }else {
-
                     boolean usePrefix = config.getUsePrefixRepCommand();
                     List<String> messages = config.getRepCommandMessages();
                     for (String message : messages){

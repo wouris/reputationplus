@@ -41,7 +41,9 @@ options:
   no-self-vote-message: "&cYou can't vote for yourself!"
 
   rep-command:
-    # use prefix in front of each message in rep-command-message
+    # set to true if you want to make players only vote +rep. This will disable any GUI related features
+    plus-rep-only: false
+    # use prefix in front of each message in rep-command-messages
     use-prefix: true
     # messages that will be sent to the player by '/rep' command
     messages:
@@ -75,6 +77,9 @@ options:
 
     # sets the title of GUI after /rep <player>
     title: '&bReputation of &3%rep_target%'
+
+    # set this to false if you don't want to use reasons
+    enable-reasons: true
 
     # this option changes the look of rep GUI. Shows 7 latest voters and their ratings on the target
     show-latest-voters:

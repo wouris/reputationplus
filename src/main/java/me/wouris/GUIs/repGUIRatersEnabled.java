@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
-public class repGUIReasonEnabled {
+public class repGUIRatersEnabled {
 
     public static Inventory createGUI(Player p, OfflinePlayer target, main plugin, Config config) throws SQLException {
         String guiTitle = PlaceholderAPI.setPlaceholders(p, config.getRepGUITitle());

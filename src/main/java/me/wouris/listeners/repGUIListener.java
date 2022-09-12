@@ -3,6 +3,7 @@ package me.wouris.listeners;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wouris.GUIs.minusRepReasonGUI;
 import me.wouris.GUIs.plusRepReasonGUI;
+import me.wouris.listeners.reasonGUIListener;
 import me.wouris.main;
 import me.wouris.model.reputationStats;
 import me.wouris.model.voteStats;
@@ -37,6 +38,8 @@ public class repGUIListener implements Listener {
         }catch (IllegalArgumentException ex){
             // this will occur if someone has not opened GUI yet and plugin will try to read target when there is none
             // thus throwing this exception
+
+            // note ~2 months later: why is this even here? I don't think there is a situation where this will happen D:
             return;
         }
 
@@ -57,7 +60,15 @@ public class repGUIListener implements Listener {
 
         if (e.getCurrentItem() != null){
             if(e.getCurrentItem().getType() == Material.valueOf(config.getPlusRepBlock())){
-                p.openInventory(plusRepReasonGUI.createGUI(plugin, p, target, config));
+                if (config.isReasonEnabled()){
+                    p.openInventory(plusRepReasonGUI.createGUI(plugin, p, target, config));
+                } else {
+                    reasonGUIListener temp = new reasonGUIListener(plugin, config);
+                    temp.preparePlayerStats(false, "positive", p, target, null,
+                            targetStats, playerStats, voteStats, prefix);
+                    // remove temp from memory
+                    temp = null;
+                }
             }else if (e.getCurrentItem().getType() == Material.valueOf(config.getMinusRepBlock())){
                 p.openInventory(minusRepReasonGUI.createGUI(plugin, p, target, config));
             }else{
